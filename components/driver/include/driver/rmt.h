@@ -130,6 +130,18 @@ typedef struct {
 } rmt_tx_end_callback_t;
 
 /**
+ * @brief Convert uint8_t type data into rmt format.
+ * @note This function may be called in the ISR function and needs implemented by user.
+ * @param src Pointer to source data that needs to be converted to rmt format.
+ * @param dest Buffer of rmt format data.
+ * @param src_size The length of the source data.
+ * @param wanted_num Wanted number of rmt format data.
+ * @param[out] translated_size Source data size that has been converted to rmt format.
+ * @param[out] item_num The number of rmt format data.
+ */
+typedef void (*sample_to_rmt_t)(const void* src, rmt_item32_t* dest, size_t src_size, size_t wanted_num, size_t* translated_size, size_t* item_num);
+
+/**
  * @brief Set RMT clock divider, channel clock is divided from source clock.
  *
  * @param channel RMT channel (0-7)
@@ -711,6 +723,30 @@ esp_err_t rmt_wait_tx_done(rmt_channel_t channel, TickType_t wait_time);
  *     - ESP_OK Success
  */
 esp_err_t rmt_get_ringbuf_handle(rmt_channel_t channel, RingbufHandle_t* buf_handle);
+
+/**
+ * @brief init rmt translator.
+ * @param channel RMT channel (0 - 7).
+ * @param fn Point to the data conversion function.
+ * @note Data conversion requires user to achieve.
+ * @return
+ *     - ESP_FAIL Init fail.
+ *     - ESP_OK Init success.
+ */
+esp_err_t rmt_translator_init(rmt_channel_t channel, sample_to_rmt_t fn);
+
+/**
+ * @brief Translate uint8_t type of data into rmt format and send it out.
+ * @note Requires rmt_translator_init to init the translator.
+ * @param channel RMT channel (0 - 7).
+ * @param src Pointer to the source data.
+ * @param src_size The length of the source data.
+ * @param wait_tx_done Set true to wait all data send done.
+ * @return
+ *     - ESP_FAIL Send fail
+ *     - ESP_OK Send success
+ */
+esp_err_t rmt_write_sample(rmt_channel_t channel, const uint8_t *src, size_t src_size, bool wait_tx_done);
 
 /**
  * @brief Registers a callback that will be called when transmission ends.
