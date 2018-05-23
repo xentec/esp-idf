@@ -26,7 +26,7 @@ include(kconfig)
 include(git_submodules)
 include(idf_functions)
 
-set_default(PYTHON "python")
+set_default(PYTHON "python2")
 
 # project
 #

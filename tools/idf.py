@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #
 # 'idf.py' is a top-level config/build command line tool for ESP-IDF
 #
